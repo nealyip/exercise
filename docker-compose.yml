@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  manager:
+    image: mysql:5.7
+    working_dir: /app
+    volumes:
+      - ./start.sh:/app/start.sh:ro
+      - ./schema.sql:/app/schema.sql:ro
+    entrypoint: /bin/sh
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    command: "/app/start.sh"
+    restart: "on-failure"
+    depends_on:
+      mysql:
+        condition: service_healthy
+  web1:
+    build: .
+    container_name: exercise_web1
+    working_dir: /app
+    ports:
+      - ${PORT}:${PORT}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "${PORT}" ]
+      interval: 10s
+      timeout: 4s
+      retries: 1
+  mysql:
+    image: mysql:5.7
+    container_name: exercise_mysql
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - ${MYSQL_PORT}:3306
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysql","-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}", "-e", "SELECT 1", "information_schema"]
+      interval: 10s
+      timeout: 4s
+      retries: 1
