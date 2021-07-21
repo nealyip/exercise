@@ -30,6 +30,7 @@ Product has many options which implies one product can have different sizes and 
 
 # Prerequisite
 1. Install Docker  
+2. Install latest Docker-compose   
 2. Install Node-14 (optional, for local development.)  
 3. Make sure the port 3333 is available.  
 
@@ -40,6 +41,9 @@ Product has many options which implies one product can have different sizes and 
 4. The server should run on 3333 port.  
 5. For testing purpose, it's possible to have some seed data written into the database.  
    `docker exec -it exercise_web1 npm run seed`
+### Troubleshooting
+If you suffer from an error stating a wrong version of the docker-compose.yaml, please find an update to the docker-compose package from the following link.  
+`https://github.com/linkedin/datahub/issues/2020`
 
 ## CRUD Endpoints
 The endpoints support both url-encoded and json input body.  
